@@ -1,0 +1,1 @@
+// script.js: Lógica de susto em JavaScript será aqui

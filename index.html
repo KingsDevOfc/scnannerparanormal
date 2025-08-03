@@ -1,377 +1,140 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
-<title>Maldição Sombria - Terror Total</title>
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Creepster&display=swap');
-
-html, body {
-  margin: 0; padding: 0; overflow: hidden;
-  background: black;
-  color: #ff0000;
-  font-family: 'Creepster', cursive, monospace;
-  user-select: none;
-  -webkit-user-select: none;
-  cursor: none;
-  height: 100%;
-  width: 100%;
-}
-
-#container {
-  position: relative;
-  width: 100vw; height: 100vh;
-  overflow: hidden;
-  background: black;
-}
-
-video, canvas {
-  position: absolute;
-  top: 0; left: 0;
-  width: 100vw; height: 100vh;
-  object-fit: cover;
-  filter: grayscale(1) contrast(2) brightness(0.4);
-  z-index: 1;
-}
-
-#overlay {
-  position: absolute;
-  top: 0; left: 0;
-  width: 100vw; height: 100vh;
-  pointer-events: none;
-  background:
-    repeating-linear-gradient(
-      0deg,
-      rgba(255,0,0,0.05) 0,
-      rgba(255,0,0,0.1) 2px,
-      rgba(0,0,0,0) 4px
-    );
-  animation: glitchLines 0.3s linear infinite;
-  mix-blend-mode: difference;
-  z-index: 2;
-}
-
-@keyframes glitchLines {
-  0% { background-position: 0 0; }
-  100% { background-position: 0 20px; }
-}
-
-#message {
-  position: absolute;
-  top: 20px; width: 100%;
-  text-align: center;
-  font-size: 2.5em;
-  color: #ff0000;
-  text-shadow:
-    0 0 10px #ff0000,
-    0 0 20px #ff0000,
-    0 0 30px #800000;
-  animation: flicker 1.5s infinite alternate;
-  z-index: 3;
-}
-
-@keyframes flicker {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.3; }
-}
-
-#final-scary {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100vw; height: 100vh;
-  background: black;
-  display: none;
-  justify-content: center;
-  align-items: center;
-  z-index: 99999;
-  flex-direction: column;
-  user-select: none;
-}
-
-#final-scary img {
-  max-width: 90vw;
-  max-height: 90vh;
-  filter: drop-shadow(0 0 30px red);
-  animation: pulse 0.8s infinite alternate;
-}
-
-#final-text {
-  margin-top: 20px;
-  font-size: 3em;
-  color: #ff0000;
-  text-shadow:
-    0 0 20px red,
-    0 0 40px darkred;
-  animation: flicker 1.5s infinite alternate;
-}
-
-@keyframes pulse {
-  0% { transform: scale(1); }
-  100% { transform: scale(1.05); }
-}
-
-/* Cursor maldito */
-body, button {
-  cursor: none;
-}
-
-.maldito-cursor {
-  position: fixed;
-  width: 30px;
-  height: 30px;
-  background: radial-gradient(circle at center, red 0%, black 100%);
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 100000;
-  mix-blend-mode: difference;
-  filter: drop-shadow(0 0 10px red);
-  animation: cursorShake 0.2s infinite alternate;
-}
-
-@keyframes cursorShake {
-  0% { transform: translate(0,0) scale(1); }
-  100% { transform: translate(3px, -3px) scale(1.2); }
-}
-
-/* Mensagens macabras piscantes */
-.msg-piscante {
-  position: fixed;
-  color: #900;
-  font-weight: bold;
-  font-size: 4em;
-  text-shadow:
-    0 0 10px #f00,
-    0 0 20px #f00,
-    0 0 30px #600;
-  animation: flicker 1s infinite alternate;
-  pointer-events: none;
-  user-select: none;
-  mix-blend-mode: difference;
-}
-
-/* Popups malditos */
-.popup-content {
-  background: black;
-  color: red;
-  font-family: monospace;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  margin: 0;
-  user-select: none;
-  text-align: center;
-  font-size: 1.5em;
-  animation: flicker 1.5s infinite alternate;
-}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MALDIÇÃO INICIADA</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background: black;
+      color: red;
+      font-family: 'Courier New', Courier, monospace;
+    }
+    video, canvas, #overlay, #final-scare {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      object-fit: cover;
+      z-index: 1;
+    }
+    #overlay {
+      background: rgba(0,0,0,0.7);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 2em;
+      z-index: 10;
+    }
+    #final-scare {
+      display: none;
+      background: black;
+      justify-content: center;
+      align-items: center;
+      z-index: 99999;
+    }
+    .msg-piscante {
+      position: absolute;
+      color: red;
+      font-size: 1.5em;
+      animation: pisca 0.3s infinite;
+    }
+    @keyframes pisca {
+      0% { opacity: 1; }
+      50% { opacity: 0; }
+      100% { opacity: 1; }
+    }
+  </style>
 </head>
 <body>
-  <div id="container">
-    <video id="webcam" autoplay muted playsinline></video>
-    <canvas id="glitchCanvas"></canvas>
-    <div id="overlay"></div>
-    <div id="message">Detectando presenças... você está sendo observado.</div>
-  </div>
-
-  <div id="final-scary">
-    <img src="https://i.imgur.com/QkrmnLh.jpeg" alt="Jeff the Killer" />
-    <div id="final-text">Você não deveria estar aqui.</div>
-  </div>
-
+<video id="video" autoplay muted playsinline></video>
+<canvas id="canvas"></canvas>
+<div id="overlay">INICIANDO MALDIÇÃO...</div>
+<div id="final-scare">
+  <img src="https://i.imgur.com/zl0BDzA.png" style="width:100vw;height:100vh;object-fit:cover;"/>
+</div>
 <script>
 (async () => {
-  // === Setup básico ===
-  const video = document.getElementById('webcam');
-  const canvas = document.getElementById('glitchCanvas');
-  const ctx = canvas.getContext('2d');
   const overlay = document.getElementById('overlay');
-  const message = document.getElementById('message');
-  const finalScary = document.getElementById('final-scary');
+  const finalScary = document.getElementById('final-scare');
+  const video = document.getElementById('video');
+  const canvas = document.getElementById('canvas');
+  const ctx = canvas.getContext('2d');
 
-  // Resize canvas para cobrir a tela toda
-  function resize() {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-  }
-  window.addEventListener('resize', resize);
-  resize();
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
 
-  // === Acessar webcam ===
+  // Força webcam
   try {
     const stream = await navigator.mediaDevices.getUserMedia({ video: true });
     video.srcObject = stream;
-  } catch (e) {
-    alert('Permita o acesso à webcam e recarregue a página.');
-    return;
+  } catch (err) {
+    console.warn('Webcam bloqueada. Continuando mesmo assim.');
   }
 
-  // === Web Audio API setup ===
-  const AudioContext = window.AudioContext || window.webkitAudioContext;
-  const audioCtx = new AudioContext();
-
-  // Função pra carregar sons
-  async function loadSound(url) {
-    const response = await fetch(url);
-    const arrayBuffer = await response.arrayBuffer();
-    return await audioCtx.decodeAudioData(arrayBuffer);
+  // Força áudio
+  let audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  let screamBuffer = null;
+  try {
+    const scream = await fetch('https://cdn.pixabay.com/download/audio/2022/03/15/audio_81e5e08fe3.mp3?filename=scream-139796.mp3');
+    const arrayBuffer = await scream.arrayBuffer();
+    screamBuffer = await audioCtx.decodeAudioData(arrayBuffer);
+  } catch (err) {
+    console.warn('Erro carregando grito.');
   }
 
-  // Carregar sons pesados
-  const screamBuffer = await loadSound('https://www.myinstants.com/media/sounds/scream.mp3');
-  const whisperBuffer = await loadSound('https://www.myinstants.com/media/sounds/creepy-whispers.mp3');
-
-  // Função para tocar som com panorama
-  function playSound(buffer, pan = 0) {
-    const source = audioCtx.createBufferSource();
-    source.buffer = buffer;
-    const panner = audioCtx.createStereoPanner();
-    panner.pan.value = pan;
-    source.connect(panner).connect(audioCtx.destination);
-    source.start();
-  }
-
-  // Spawn sussurros com panning aleatório
-  function spawnWhispers() {
-    [-1, -0.5, 0, 0.5, 1].forEach((pan, i) => {
-      setTimeout(() => {
-        playSound(whisperBuffer, pan);
-      }, i * 1200 + Math.random() * 900);
-    });
-  }
-
-  // Efeito glitch na webcam
-  function glitchEffect() {
-    if (video.readyState >= 2) {
+  // Glitch loop
+  function glitch() {
+    if (video.readyState === 4) {
       ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-      for (let i = 0; i < 10; i++) {
-        const y = Math.random() * canvas.height;
-        const height = 5 + Math.random() * 15;
-        const xOffset = (Math.random() - 0.5) * 30;
-        ctx.drawImage(canvas, 0, y, canvas.width, height, xOffset, y, canvas.width, height);
+      let imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      for (let i = 0; i < imageData.data.length; i += 4) {
+        imageData.data[i] += Math.random() * 20 - 10;
+        imageData.data[i + 1] += Math.random() * 20 - 10;
+        imageData.data[i + 2] += Math.random() * 20 - 10;
       }
-      // Shift de cor vermelho
-      const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-      const d = imgData.data;
-      for (let i = 0; i < d.length; i += 4) {
-        d[i] = d[i] + 50;     // Red
-        d[i + 1] = d[i + 1] - 20; // Green
-        d[i + 2] = d[i + 2] - 20; // Blue
-      }
-      ctx.putImageData(imgData, 0, 0);
+      ctx.putImageData(imageData, 0, 0);
     }
+    requestAnimationFrame(glitch);
   }
+  glitch();
 
-  // Cursor maldito tremendo
-  function creepyCursor() {
-    document.body.style.cursor = 'none';
-    const cursor = document.createElement('div');
-    cursor.classList.add('maldito-cursor');
-    document.body.appendChild(cursor);
-    window.addEventListener('mousemove', e => {
-      const x = e.clientX + (Math.random() - 0.5) * 30;
-      const y = e.clientY + (Math.random() - 0.5) * 30;
-      cursor.style.transform = `translate(${x}px, ${y}px)`;
-    });
-  }
+  // Mensagens aleatórias
+  const frases = [
+    'VOCÊ NÃO DEVERIA ESTAR AQUI',
+    'NÃO OLHE PARA TRÁS',
+    'SEU TEMPO ACABOU',
+    'ELES ESTÃO VINDO',
+    'O AR ESTÁ MAIS FRIO...',
+    'ALGO TE OBSERVA',
+    'CORRA',
+    'JÁ É TARDE DEMAIS'
+  ];
+  setInterval(() => {
+    const msg = document.createElement('div');
+    msg.className = 'msg-piscante';
+    msg.textContent = frases[Math.floor(Math.random() * frases.length)];
+    msg.style.top = `${Math.random() * 90}vh`;
+    msg.style.left = `${Math.random() * 90}vw`;
+    document.body.appendChild(msg);
+    setTimeout(() => msg.remove(), 3000);
+  }, 2000);
 
-  // Mensagens macabras piscando
-  function spawnRandomMessages() {
-    const texts = [
-      'VOCÊ NÃO DEVERIA ESTAR AQUI',
-      'ELAS TE VÊEM',
-      'NÃO OLHE PARA TRÁS',
-      'SEUS PIORES MEDOS ESTÃO AQUI',
-      'VOCÊ ESTÁ SENDO OBSERVADO',
-      'SEU TEMPO ACABOU',
-      'NÃO HÁ ESCAPE',
-      'O TERROR ESTÁ PRÓXIMO',
-      'SENTIU ISSO?',
-      'OLHE ATRÁS'
-    ];
-    const container = document.createElement('div');
-    container.style.position = 'fixed';
-    container.style.top = '0';
-    container.style.left = '0';
-    container.style.width = '100vw';
-    container.style.height = '100vh';
-    container.style.pointerEvents = 'none';
-    container.style.zIndex = '99998';
-    document.body.appendChild(container);
-
-    setInterval(() => {
-      const msg = document.createElement('div');
-      msg.textContent = texts[Math.floor(Math.random() * texts.length)];
-      msg.classList.add('msg-piscante');
-      msg.style.top = `${Math.random() * 90}vh`;
-      msg.style.left = `${Math.random() * 90}vw`;
-      container.appendChild(msg);
-      setTimeout(() => container.removeChild(msg), 3000);
-    }, 1000);
-  }
-
-  // Popups malditos (PC, pode ser bloqueado em mobile)
-  function spawnPopups() {
-    let count = 0;
-    const maxPopups = 10;
-    function openPopup() {
-      if (count >= maxPopups) return;
-      count++;
-      const popup = window.open('', '', 'width=350,height=180,top=100,left=100');
-      if (!popup) return; // Bloqueado
-      popup.document.write(`
-        <body style="background:black;color:red;font-family:monospace;display:flex;justify-content:center;align-items:center;height:100vh;margin:0;">
-          <h1>VOCÊ ESTÁ SENDO OBSERVADO</h1>
-        </body>
-      `);
-      setTimeout(() => {
-        popup.close();
-        openPopup();
-      }, 3500 + Math.random() * 3000);
+  // Ativar susto final
+  setTimeout(() => {
+    overlay.style.display = 'none';
+    finalScary.style.display = 'flex';
+    if (screamBuffer) {
+      const src = audioCtx.createBufferSource();
+      src.buffer = screamBuffer;
+      src.connect(audioCtx.destination);
+      src.start();
     }
-    openPopup();
-  }
-
-  // Loop principal
-  let frame = 0;
-  function mainLoop() {
-    glitchEffect();
-    frame++;
-
-    if (frame === 60) {
-      message.textContent = 'Detectando presenças... mais perto...';
-    }
-    if (frame === 180) {
-      spawnWhispers();
-      spawnRandomMessages();
-      spawnPopups();
-      creepyCursor();
-    }
-    if (frame === 450) {
-      // Susto final
-      finalScary.style.display = 'flex';
-      const screamSource = audioCtx.createBufferSource();
-      screamSource.buffer = screamBuffer;
-      screamSource.connect(audioCtx.destination);
-      screamSource.start();
-      message.style.display = 'none';
-      video.style.display = 'none';
-      canvas.style.display = 'none';
-      overlay.style.display = 'none';
-    }
-
-    requestAnimationFrame(mainLoop);
-  }
-
-  mainLoop();
-
-  // === Ativa áudio no toque para mobile ===
-  document.body.addEventListener('touchstart', () => {
-    if (audioCtx.state === 'suspended') {
-      audioCtx.resume();
-    }
-  }, { once: true });
+  }, 15000); // 15s para susto
 
 })();
 </script>

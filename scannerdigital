@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Detector Paranormal - AO VIVO</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { width: 100vw; height: 100vh; background: black; color: white; font-family: 'Courier New', monospace; overflow: hidden; }
+    .container {
+      display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh;
+    }
+    #radar {
+      width: 300px; height: 300px; border: 2px solid red; border-radius: 50%; position: relative;
+    }
+    #pointer {
+      position: absolute; width: 2px; height: 150px; background: red; top: 0; left: 149px;
+      transform-origin: bottom center;
+    }
+    #msg {
+      margin-top: 20px; font-size: 1.3em; text-align: center;
+    }
+    #susto-img, #msg-final {
+      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 9999; display: none;
+      background-color: black; justify-content: center; align-items: center; flex-direction: column;
+      color: red; font-size: 3em; text-align: center;
+    }
+    #susto-img img, #webcam-feed {
+      max-width: 100vw; max-height: 100vh;
+    }
+    #webcam-feed {
+      position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; object-fit: cover; filter: grayscale(1) contrast(1.5) brightness(0.6);
+      z-index: 9998; display: none;
+    }
+    @keyframes flicker {
+      0% { opacity: 1; }
+      50% { opacity: 0.1; }
+      100% { opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+  <video id="webcam-feed" autoplay muted></video>
+  <div class="container">
+    <h1>Detector de Energia Paranormal</h1>
+    <div id="radar">
+      <div id="pointer"></div>
+    </div>
+    <div id="msg">Escaneando ambiente... Por favor, aguarde.</div>
+  </div>
+
+  <div id="susto-img">
+    <img src="https://i.imgur.com/xuOARdL.jpeg" alt="Aparição">
+  </div>
+  <div id="msg-final">VOCÊ ESTÁ SENDO OBSERVADO<br><br><span style="font-size:0.6em;">não adianta correr</span></div>
+
+  <audio id="beep" src="https://www.myinstants.com/media/sounds/beep.mp3"></audio>
+  <audio id="psiu" src="https://www.myinstants.com/media/sounds/psiu_1.mp3"></audio>
+  <audio id="grito" src="https://www.myinstants.com/media/sounds/scream.mp3"></audio>
+  <audio id="voz" src="https://www.myinstants.com/media/sounds/you-shouldnt-have-done-that.mp3"></audio>
+
+  <script>
+    const pointer = document.getElementById('pointer');
+    const msg = document.getElementById('msg');
+    const beep = document.getElementById('beep');
+    const psiu = document.getElementById('psiu');
+    const grito = document.getElementById('grito');
+    const voz = document.getElementById('voz');
+    const webcam = document.getElementById('webcam-feed');
+
+    let angle = 0;
+    let level = 0;
+    let scareTriggered = false;
+
+    // Ativa webcam (se permitido)
+    navigator.mediaDevices.getUserMedia({ video: true })
+      .then(stream => {
+        webcam.srcObject = stream;
+      })
+      .catch(() => {
+        console.warn("Webcam bloqueada.");
+      });
+
+    const radarInterval = setInterval(() => {
+      angle += 5;
+      pointer.style.transform = `rotate(${angle}deg)`;
+
+      if (angle % 90 === 0 && !scareTriggered) {
+        level++;
+        beep.play();
+        msg.innerText = `Análise ${level}/5: Presença detectada...`;
+      }
+
+      if (level === 5 && !scareTriggered) {
+        scareTriggered = true;
+        setTimeout(() => {
+          msg.innerText = 'Energia maligna intensa. Capturando imagem...';
+          setTimeout(() => {
+            psiu.play();
+            webcam.style.display = 'block';
+            setTimeout(() => {
+              webcam.style.display = 'none';
+              document.getElementById('susto-img').style.display = 'flex';
+              grito.play();
+              setTimeout(() => {
+                document.getElementById('susto-img').style.display = 'none';
+                document.getElementById('msg-final').style.display = 'flex';
+                voz.play();
+              }, 2500);
+            }, 2000);
+          }, 1500);
+        }, 1000);
+        clearInterval(radarInterval);
+      }
+    }, 200);
+  </script>
+</body>
+</html>

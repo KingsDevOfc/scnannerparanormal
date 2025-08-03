@@ -19,22 +19,42 @@
     #msg {
       margin-top: 20px; font-size: 1.3em; text-align: center;
     }
-    #susto-img, #msg-final {
+    #susto-img, #msg-final, #jump-img, #whispers-msg, #vhs-overlay {
       position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 9999; display: none;
-      background-color: black; justify-content: center; align-items: center; flex-direction: column;
+      justify-content: center; align-items: center; flex-direction: column;
       color: red; font-size: 3em; text-align: center;
     }
-    #susto-img img, #webcam-feed {
+    #susto-img img, #jump-img img, #webcam-feed {
       max-width: 100vw; max-height: 100vh;
     }
     #webcam-feed {
       position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; object-fit: cover; filter: grayscale(1) contrast(1.5) brightness(0.6);
       z-index: 9998; display: none;
     }
+    .whisper {
+      position: absolute; font-size: 2em; color: rgba(255, 0, 0, 0.1); animation: flicker 0.5s infinite;
+    }
     @keyframes flicker {
-      0% { opacity: 1; }
-      50% { opacity: 0.1; }
-      100% { opacity: 1; }
+      0% { opacity: 0.1; }
+      50% { opacity: 1; }
+      100% { opacity: 0.1; }
+    }
+    #vhs-overlay::before {
+      content: "";
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: repeating-linear-gradient(black 0px, rgba(255,255,255,0.02) 2px, black 4px);
+      animation: glitch 0.2s infinite;
+      pointer-events: none;
+    }
+    @keyframes glitch {
+      0% { transform: translate(0, 0); opacity: 0.8; }
+      20% { transform: translate(-5px, 2px); }
+      40% { transform: translate(5px, -3px); }
+      60% { transform: translate(-2px, 4px); }
+      80% { transform: translate(3px, -1px); }
+      100% { transform: translate(0, 0); opacity: 1; }
     }
   </style>
 </head>
@@ -51,12 +71,19 @@
   <div id="susto-img">
     <img src="https://i.imgur.com/xuOARdL.jpeg" alt="Aparição">
   </div>
+  <div id="jump-img">
+    <img src="https://i.imgur.com/QkrmnLh.jpeg" alt="Jeff the Killer">
+  </div>
   <div id="msg-final">VOCÊ ESTÁ SENDO OBSERVADO<br><br><span style="font-size:0.6em;">não adianta correr</span></div>
+  <div id="whispers-msg"></div>
+  <div id="vhs-overlay"></div>
 
   <audio id="beep" src="https://www.myinstants.com/media/sounds/beep.mp3"></audio>
   <audio id="psiu" src="https://www.myinstants.com/media/sounds/psiu_1.mp3"></audio>
   <audio id="grito" src="https://www.myinstants.com/media/sounds/scream.mp3"></audio>
   <audio id="voz" src="https://www.myinstants.com/media/sounds/you-shouldnt-have-done-that.mp3"></audio>
+  <audio id="whispers" src="https://www.myinstants.com/media/sounds/creepy-whispers.mp3" loop></audio>
+  <audio id="batidas" src="https://www.myinstants.com/media/sounds/thud.mp3"></audio>
 
   <script>
     const pointer = document.getElementById('pointer');
@@ -66,12 +93,29 @@
     const grito = document.getElementById('grito');
     const voz = document.getElementById('voz');
     const webcam = document.getElementById('webcam-feed');
+    const jumpImg = document.getElementById('jump-img');
+    const whispersAudio = document.getElementById('whispers');
+    const batidas = document.getElementById('batidas');
+    const whispersDiv = document.getElementById('whispers-msg');
+    const vhsOverlay = document.getElementById('vhs-overlay');
 
     let angle = 0;
     let level = 0;
     let scareTriggered = false;
 
-    // Ativa webcam (se permitido)
+    const whisperTexts = ["ele está vindo", "você ouve isso?", "não confie no reflexo", "você não está só"];
+
+    function randomWhispers() {
+      whisperTexts.forEach((text) => {
+        const span = document.createElement('span');
+        span.classList.add('whisper');
+        span.innerText = text;
+        span.style.top = `${Math.random() * 90}%`;
+        span.style.left = `${Math.random() * 90}%`;
+        whispersDiv.appendChild(span);
+      });
+    }
+
     navigator.mediaDevices.getUserMedia({ video: true })
       .then(stream => {
         webcam.srcObject = stream;
@@ -90,6 +134,16 @@
         msg.innerText = `Análise ${level}/5: Presença detectada...`;
       }
 
+      if (level === 3 && !scareTriggered) {
+        batidas.play();
+        whispersAudio.play();
+        randomWhispers();
+      }
+
+      if (level === 4 && !scareTriggered) {
+        vhsOverlay.style.display = 'block';
+      }
+
       if (level === 5 && !scareTriggered) {
         scareTriggered = true;
         setTimeout(() => {
@@ -99,14 +153,18 @@
             webcam.style.display = 'block';
             setTimeout(() => {
               webcam.style.display = 'none';
-              document.getElementById('susto-img').style.display = 'flex';
+              jumpImg.style.display = 'flex';
               grito.play();
               setTimeout(() => {
-                document.getElementById('susto-img').style.display = 'none';
-                document.getElementById('msg-final').style.display = 'flex';
-                voz.play();
-              }, 2500);
-            }, 2000);
+                jumpImg.style.display = 'none';
+                document.getElementById('susto-img').style.display = 'flex';
+                setTimeout(() => {
+                  document.getElementById('susto-img').style.display = 'none';
+                  document.getElementById('msg-final').style.display = 'flex';
+                  voz.play();
+                }, 2500);
+              }, 2000);
+            }, 1500);
           }, 1500);
         }, 1000);
         clearInterval(radarInterval);
